@@ -25,12 +25,14 @@ const getData = async () => {
     console.log(`Median price: ${ calcMedianPrice(data[0]).toLocaleString() } USDT`);
     console.log(`Min price: ${ calcMinPrice(data[0]).toLocaleString() } USDT`);
     console.log(`Max price: ${ calcMaxPrice(data[0]).toLocaleString() } USDT`);
+    console.log(`Total advs: ${ data[0].length }`);
 
     console.log('---SELL---');
     console.log(`Demand: ${ calcTotalTradableQuantity(data[1]).toLocaleString() } USDT`);
     console.log(`Median price: ${ calcMedianPrice(data[1]).toLocaleString() } USDT`);
     console.log(`Min price: ${ calcMinPrice(data[1]).toLocaleString() } USDT`);
     console.log(`Max price: ${ calcMaxPrice(data[1]).toLocaleString() } USDT`);
+    console.log(`Total advs: ${ data[1].length }`);
 }
 
 getData();
