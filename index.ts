@@ -13,26 +13,28 @@ const options: Options = {
 }
 
 const getData = async () => {
-    const promisesData = [
-        getAllPages({ ...options, tradeType: 'BUY' } ),
-        getAllPages({ ...options, tradeType: 'SELL' } )
-    ];
+    try {
+        const promisesData = [
+            getAllPages({ ...options, tradeType: 'BUY' } ),
+            getAllPages({ ...options, tradeType: 'SELL' } )
+        ];
 
-    const data = await Promise.all(promisesData);
+        const data = await Promise.all(promisesData);
 
-    console.log('---BUY---');
-    console.log(`Supply: ${ calcTotalTradableQuantity(data[0]).toLocaleString() } USDT`);
-    console.log(`Median price: ${ calcMedianPrice(data[0]).toLocaleString() } USDT`);
-    console.log(`Min price: ${ calcMinPrice(data[0]).toLocaleString() } USDT`);
-    console.log(`Max price: ${ calcMaxPrice(data[0]).toLocaleString() } USDT`);
-    console.log(`Total advs: ${ data[0].length }`);
+        logResult('SELL', options.asset, data[0]);
+        logResult('BUY', options.asset, data[1]);
+    } catch (e) {
+        console.log(e);
+    }
+}
 
-    console.log('---SELL---');
-    console.log(`Demand: ${ calcTotalTradableQuantity(data[1]).toLocaleString() } USDT`);
-    console.log(`Median price: ${ calcMedianPrice(data[1]).toLocaleString() } USDT`);
-    console.log(`Min price: ${ calcMinPrice(data[1]).toLocaleString() } USDT`);
-    console.log(`Max price: ${ calcMaxPrice(data[1]).toLocaleString() } USDT`);
-    console.log(`Total advs: ${ data[1].length }`);
+const logResult = (tradeType: string, coin: string, data: any[]) => {
+    console.log(`---${tradeType}---`);
+    console.log(`Supply: ${ calcTotalTradableQuantity(data).toLocaleString() } ${coin}`);
+    console.log(`Median price: ${ calcMedianPrice(data).toLocaleString() } ${coin}`);
+    console.log(`Min price: ${ calcMinPrice(data).toLocaleString() } ${coin}`);
+    console.log(`Max price: ${ calcMaxPrice(data).toLocaleString() } ${coin}`);
+    console.log(`Total advs: ${ data.length }`);
 }
 
 getData();
