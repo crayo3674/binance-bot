@@ -1,12 +1,17 @@
-export interface Options {
-    page?: number,
+export interface basicOptions {
     fiat: string,
-    countries: string[],
-    tradeType?: 'SELL' | 'BUY',
-    payTypes: string[],
-    rows: number,
     asset: string,
-    publisherType: null,
-    shieldMerchantAds: boolean,
-    proMerchantAds: boolean
+    payTypes: string[],
 }
+
+export interface fullOptions extends basicOptions {
+    page: number,
+    countries: string[],
+    tradeType: TradeType,
+    rows: number,
+    publisherType?: string | null,
+    shieldMerchantAds?: boolean,
+    proMerchantAds?: boolean
+}
+
+export type TradeType = 'SELL' | 'BUY';
