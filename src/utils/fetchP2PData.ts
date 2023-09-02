@@ -1,4 +1,4 @@
-import { fullOptions, basicOptions, TradeType } from './models';
+import { fullOptions, basicOptions, TradeType, ApiResponse } from './models';
 import { url, config } from './constants';
 import { median } from 'mathjs';
 import axios from 'axios';
@@ -67,12 +67,12 @@ export const getData = async (options: basicOptions) => {
 }
 
 const getPage = (options: fullOptions) => {
-    return axios.post(url.search, options, config);
+    return axios.post<ApiResponse>(url.search, options, config);
 }
 
 const getAllPages = async (options: basicOptions, tradeType: TradeType) => {
     const firstPage = await getPage({ ...options,  tradeType , page: 1, countries: [], rows: 20 });
-    const totalPages = Math.ceil(parseInt(firstPage.data.total) / 20);
+    const totalPages = Math.ceil(firstPage.data.total / 20);
     const pages = [...firstPage.data.data];
 
     const promisePages = [];
