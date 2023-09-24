@@ -1,4 +1,13 @@
-import { FullOptions, BasicOptions, TradeType, ApiResponse } from './models';
+import {
+    FilterConditionsData,
+    TradeDataSearch,
+    BasicOptions,
+    CurrencyData,
+    FullOptions,
+    ApiResponse,
+    ConfigData,
+    TradeType
+} from './models';
 import { url, config } from './constants';
 import { median } from 'mathjs';
 import axios from 'axios';
@@ -6,13 +15,13 @@ import axios from 'axios';
 // Fetch user options
 
 export const getAssets = async (fiat: string) => {
-    const configData = await axios.post(url.config, { fiat }, config);
+    const configData = await axios.post<ApiResponse<ConfigData>>(url.config, { fiat }, config);
 
     return {
         message: 'Select coin',
         choices: configData.data.data.areas
-            .find((elem: { area: string }) => elem.area === 'P2P').tradeSides[0].assets
-            .map((elem: { asset: string }) => {
+            .find(elem => elem.area === 'P2P')!.tradeSides[0].assets
+            .map(elem => {
                 return {
                   name: elem.asset,
                   value: elem.asset
@@ -22,11 +31,11 @@ export const getAssets = async (fiat: string) => {
 }
 
 export const getPayTypesToSelect = async (fiat: string) => {
-    const filterConditions = await axios.post(url.filterConditions, { fiat }, config);
+    const filterConditions = await axios.post<ApiResponse<FilterConditionsData>>(url.filterConditions, { fiat }, config);
 
     return {
         message: 'Select payment method',
-        choices: filterConditions.data.data.tradeMethods.map(( elem: { identifier: string, tradeMethodName: string }) => {
+        choices: filterConditions.data.data.tradeMethods.map(elem => {
             return {
                 name: elem.tradeMethodName,
                 value: elem.identifier
@@ -37,11 +46,11 @@ export const getPayTypesToSelect = async (fiat: string) => {
 }
 
 export const getFiatToSelect = async () => {
-    const fiatList = await axios.post(url.fiatList, undefined, config);
+    const fiatList = await axios.post<ApiResponse<CurrencyData>>(url.fiatList, undefined, config);
 
     return {
         message: 'Select fiat',
-        choices: fiatList.data.data.map((elem: { currencyCode: string }) => {
+        choices: fiatList.data.data.map(elem => {
             return {
                 name: elem.currencyCode,
                 value: elem.currencyCode
@@ -67,7 +76,7 @@ export const getData = async (options: BasicOptions) => {
 }
 
 const getPage = (options: FullOptions) => {
-    return axios.post<ApiResponse>(url.search, options, config);
+    return axios.post<ApiResponse<TradeDataSearch>>(url.search, options, config);
 }
 
 const getAllPages = async (options: BasicOptions, tradeType: TradeType) => {
@@ -90,7 +99,7 @@ const getAllPages = async (options: BasicOptions, tradeType: TradeType) => {
 
 // Log metric results
 
-const logResult = (tradeType: TradeType, coin: string, data: any[]) => {
+const logResult = (tradeType: TradeType, coin: string, data: TradeDataSearch[]) => {
     console.log(`--${tradeType}--`);
     console.log(`Total: ${ calcTotalTradableQuantity(data).toLocaleString() } ${coin}`);
     console.log(`Median price: ${ calcMedianPrice(data).toLocaleString() } ${coin}`);
@@ -99,18 +108,18 @@ const logResult = (tradeType: TradeType, coin: string, data: any[]) => {
     console.log(`Total advs: ${ data.length }`);
 }
 
-const calcTotalTradableQuantity = (pages: any[]) => {
-    return pages.reduce((acc, elem) => acc + parseFloat(elem.adv.tradableQuantity), 0.00) as number;
+const calcTotalTradableQuantity = (pages: TradeDataSearch[]) => {
+    return pages.reduce((acc, elem) => acc + parseFloat(elem.adv.tradableQuantity), 0.00);
 }
 
-const calcMedianPrice = (pages: any[]) => {
-    return median(pages.map(elem => elem.adv.price)) as number;
+const calcMedianPrice = (pages: TradeDataSearch[]) => {
+    return median(pages.map(elem => parseFloat(elem.adv.price)));
 }
 
-const calcMinPrice = (pages: any[]) => {
-    return Math.min(...pages.map(elem => elem.adv.price));
+const calcMinPrice = (pages: TradeDataSearch[]) => {
+    return Math.min(...pages.map(elem => parseFloat(elem.adv.price)));
 }
 
-const calcMaxPrice = (pages: any[]) => {
-    return Math.max(...pages.map(elem => elem.adv.price));
+const calcMaxPrice = (pages: TradeDataSearch[]) => {
+    return Math.max(...pages.map(elem => parseFloat(elem.adv.price)));
 }
