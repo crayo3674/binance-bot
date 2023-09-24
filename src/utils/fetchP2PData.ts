@@ -64,8 +64,8 @@ export const getFiatToSelect = async () => {
 export const getData = async (options: BasicOptions) => {
     try {
         const data = await Promise.all([
-            getAllPages(options, 'BUY' ),
-            getAllPages(options, 'SELL' )
+            getAllPages(options, 'BUY'),
+            getAllPages(options, 'SELL')
         ]);
 
         logResult('BUY', options.asset, data[0]);
