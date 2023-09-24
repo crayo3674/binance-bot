@@ -16,8 +16,47 @@ export interface fullOptions extends basicOptions {
 
 export type TradeType = 'SELL' | 'BUY';
 
-interface TradeMethod {
-    payId: null | string;
+// Config data
+
+interface Asset {
+    asset: string;
+    description: null | string;
+    iconUrl: string;
+    newToken: null | string;
+    pop: null | string;
+}
+
+interface TradeSide {
+    side: TradeType;
+    assets: Asset[];
+    convertAssets: any[];
+    tradeMethods: { identifier: string }[];
+}
+
+interface Area {
+    area: string;
+    proMerchantFilterAvailable: boolean;
+    tradeSides: TradeSide[];
+    filters: {
+        proMerchant: boolean;
+        advancedSort: boolean;
+        makerCategory: any;
+    };
+}
+
+export interface ConfigData {
+    fiat: string,
+    areas: Area[],
+    filterDefaultValues: {
+        publisherType: string;
+    };
+}
+
+// Filter conditions data
+
+interface TradeMethod <T> {
+    payId: T extends TradeDataSearch ? null | string : never;
+    id: T extends FilterConditionsData ? null | string : never;
     payMethodId: string;
     payType: null | string;
     payAccount: null | string;
@@ -29,6 +68,20 @@ interface TradeMethod {
     tradeMethodShortName: string;
     tradeMethodBgColor: string;
 }
+
+interface Country {
+    scode: string,
+    name: string
+}
+
+export interface FilterConditionsData {
+    countries: Country[],
+    tradeMethods: TradeMethod<FilterConditionsData>[],
+    preferredCountry: string,
+    periods: number[]
+}
+
+// Trade data
 
 interface Adv {
     advNo: string;
@@ -53,7 +106,7 @@ interface Adv {
     remarks: null | string;
     autoReplyMsg: string;
     payTimeLimit: number;
-    tradeMethods: TradeMethod[];
+    tradeMethods: TradeMethod<TradeDataSearch>[];
     userTradeCountFilterTime: null | string;
     userBuyTradeCountMin: null | string;
     userBuyTradeCountMax: null | string;
@@ -119,16 +172,26 @@ interface Advertiser {
     activeTimeInSecond: number;
 }
 
-interface TradeDataSearch {
+export interface TradeDataSearch {
     adv: Adv;
     advertiser: Advertiser;
 }
 
-export interface ApiResponse {
+// Currency data
+
+export interface CurrencyData {
+    currencyCode: string;
+    currencySymbol: string;
+    currencyScale: number;
+    countryCode: string;
+    iconUrl: string;
+}
+
+export interface ApiResponse <T> {
     code: string;
     message: null | string;
     messageDetail: null | string;
-    data: TradeDataSearch[];
-    total: number;
+    data: T[];
+    total: T extends TradeDataSearch ? number : never;
     success: boolean;
 }
