@@ -11,6 +11,7 @@ import {
 import { url, config } from './constants';
 import { median } from 'mathjs';
 import axios from 'axios';
+import Table from 'cli-table3';
 
 // Fetch user options
 
@@ -68,8 +69,7 @@ export const getData = async (options: BasicOptions) => {
             getAllPages(options, 'SELL')
         ]);
 
-        logResult('BUY', options.asset, data[0]);
-        logResult('SELL', options.asset, data[1]);
+        logResult('BUY', options.asset, data[0], data[1]);
     } catch (e) {
         console.log(e);
     }
@@ -99,13 +99,27 @@ const getAllPages = async (options: BasicOptions, tradeType: TradeType) => {
 
 // Log metric results
 
-const logResult = (tradeType: TradeType, coin: string, data: TradeDataSearch[]) => {
-    console.log(`--${tradeType}--`);
-    console.log(`Total: ${ calcTotalTradableQuantity(data).toLocaleString() } ${coin}`);
-    console.log(`Median price: ${ calcMedianPrice(data).toLocaleString() } ${coin}`);
-    console.log(`Min price: ${ calcMinPrice(data).toLocaleString() } ${coin}`);
-    console.log(`Max price: ${ calcMaxPrice(data).toLocaleString() } ${coin}`);
-    console.log(`Total advs: ${ data.length }`);
+const logResult = (tradeType: TradeType, coin: string, dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
+    const table = new Table({
+        head: ['METRICS', 'BUY', 'SELL'],
+        colWidths: [15, 20, 20],
+        style: {
+            head: [],
+            border: [],
+            compact: true
+        },
+        colAligns: ['center', 'center', 'center']
+    });
+
+    table.push(
+        ['Total', calcTotalTradableQuantity(dataBuy).toLocaleString(), calcTotalTradableQuantity(dataSell).toLocaleString()],
+        ['Median Price', calcMedianPrice(dataBuy).toLocaleString(), calcMedianPrice(dataSell).toLocaleString()],
+        ['Min Price', calcMinPrice(dataBuy).toLocaleString(), calcMinPrice(dataSell).toLocaleString()],
+        ['Max Price', calcMaxPrice(dataBuy).toLocaleString(), calcMaxPrice(dataSell).toLocaleString()],
+        ['Total advs', dataBuy.length, dataSell.length]
+    );
+
+    console.log(table.toString());
 }
 
 const calcTotalTradableQuantity = (pages: TradeDataSearch[]) => {
