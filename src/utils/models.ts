@@ -1,10 +1,10 @@
-export interface basicOptions {
+export interface BasicOptions {
     fiat: string,
     asset: string,
     payTypes: string[],
 }
 
-export interface fullOptions extends basicOptions {
+export interface FullOptions extends BasicOptions {
     page: number,
     countries: string[],
     tradeType: TradeType,
@@ -191,7 +191,7 @@ export interface ApiResponse <T> {
     code: string;
     message: null | string;
     messageDetail: null | string;
-    data: T[];
+    data: T extends TradeDataSearch | CurrencyData ? T[] : T;
     total: T extends TradeDataSearch ? number : never;
     success: boolean;
 }
