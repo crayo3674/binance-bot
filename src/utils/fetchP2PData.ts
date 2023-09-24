@@ -69,7 +69,7 @@ export const getData = async (options: BasicOptions) => {
             getAllPages(options, 'SELL')
         ]);
 
-        logResult('BUY', options.asset, data[0], data[1]);
+        logResult(data[0], data[1]);
     } catch (e) {
         console.log(e);
     }
@@ -99,7 +99,7 @@ const getAllPages = async (options: BasicOptions, tradeType: TradeType) => {
 
 // Log metric results
 
-const logResult = (tradeType: TradeType, coin: string, dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
+const logResult = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
     const table = new Table({
         head: ['METRICS', 'BUY', 'SELL'],
         colWidths: [15, 20, 20],
