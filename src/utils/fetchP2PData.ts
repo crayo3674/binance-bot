@@ -112,11 +112,12 @@ const logResult = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
     });
 
     table.push(
-        ['Total', calcTotalTradableQuantity(dataBuy).toLocaleString(), calcTotalTradableQuantity(dataSell).toLocaleString()],
         ['Median Price', calcMedianPrice(dataBuy).toLocaleString(), calcMedianPrice(dataSell).toLocaleString()],
         ['Min Price', calcMinPrice(dataBuy).toLocaleString(), calcMinPrice(dataSell).toLocaleString()],
         ['Max Price', calcMaxPrice(dataBuy).toLocaleString(), calcMaxPrice(dataSell).toLocaleString()],
-        ['Total advs', dataBuy.length, dataSell.length]
+        ['Total advs', dataBuy.length, dataSell.length],
+        ['Total', calcTotalTradableQuantity(dataBuy).toLocaleString(), calcTotalTradableQuantity(dataSell).toLocaleString()],
+        [{ content: 'Diff total', colSpan: 2 }, calcDiff(calcTotalTradableQuantity(dataBuy), calcTotalTradableQuantity(dataSell))]
     );
 
     console.log(table.toString());
@@ -136,4 +137,8 @@ const calcMinPrice = (pages: TradeDataSearch[]) => {
 
 const calcMaxPrice = (pages: TradeDataSearch[]) => {
     return Math.max(...pages.map(elem => parseFloat(elem.adv.price)));
+}
+
+const calcDiff = (a: number, b: number) => {
+    return `${ (((b - a) / a) * 100).toLocaleString() }%`;
 }
