@@ -100,6 +100,13 @@ const getAllPages = async (options: BasicOptions, tradeType: TradeType) => {
 // Log metric results
 
 const logResult = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
+    const dataMetric = transformToPropertyArraySide(dataBuy, dataSell);
+
+    const totalTradableQuantity = {
+      buy: calcTotalTradableQuantity(dataMetric.buy['tradableQuantitys']),
+      sell: calcTotalTradableQuantity(dataMetric.sell['tradableQuantitys'])
+    };
+
     const table = new Table({
         head: ['METRICS', 'BUY', 'SELL'],
         colWidths: [15, 20, 20],
@@ -112,33 +119,51 @@ const logResult = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
     });
 
     table.push(
-        ['Median Price', calcMedianPrice(dataBuy).toLocaleString(), calcMedianPrice(dataSell).toLocaleString()],
-        ['Min Price', calcMinPrice(dataBuy).toLocaleString(), calcMinPrice(dataSell).toLocaleString()],
-        ['Max Price', calcMaxPrice(dataBuy).toLocaleString(), calcMaxPrice(dataSell).toLocaleString()],
+        ['Median Price', calcMedianPrice(dataMetric.buy['prices']).toLocaleString(), calcMedianPrice(dataMetric.sell['prices'])],
+        ['Min Price', calcMinPrice(dataMetric.buy['prices']).toLocaleString(), calcMinPrice(dataMetric.sell['prices']).toLocaleString()],
+        ['Max Price', calcMaxPrice(dataMetric.buy['prices']).toLocaleString(), calcMaxPrice(dataMetric.sell['prices']).toLocaleString()],
         ['Total advs', dataBuy.length, dataSell.length],
-        ['Total', calcTotalTradableQuantity(dataBuy).toLocaleString(), calcTotalTradableQuantity(dataSell).toLocaleString()],
-        [{ content: 'Diff total', colSpan: 2 }, calcDiff(calcTotalTradableQuantity(dataBuy), calcTotalTradableQuantity(dataSell))]
+        ['Total', totalTradableQuantity.buy.toLocaleString(), totalTradableQuantity.sell.toLocaleString()],
+        [{ content: 'Diff total', colSpan: 2 }, `${calcDiff(totalTradableQuantity.buy, totalTradableQuantity.sell).toFixed(2)}%`]
     );
 
     console.log(table.toString());
 }
 
-const calcTotalTradableQuantity = (pages: TradeDataSearch[]) => {
-    return pages.reduce((acc, elem) => acc + parseFloat(elem.adv.tradableQuantity), 0.00);
+const calcTotalTradableQuantity = (tradableQuantitys: number[]) => {
+    return tradableQuantitys.reduce((acc, elem) => acc + elem);
 }
 
-const calcMedianPrice = (pages: TradeDataSearch[]) => {
-    return median(pages.map(elem => parseFloat(elem.adv.price)));
+const calcMedianPrice = (prices: number[]) => {
+    return median(prices);
 }
 
-const calcMinPrice = (pages: TradeDataSearch[]) => {
-    return Math.min(...pages.map(elem => parseFloat(elem.adv.price)));
+const calcMinPrice = (prices: number[]) => {
+    return Math.min(...prices);
 }
 
-const calcMaxPrice = (pages: TradeDataSearch[]) => {
-    return Math.max(...pages.map(elem => parseFloat(elem.adv.price)));
+const calcMaxPrice = (prices: number[]) => {
+    return Math.max(...prices);
 }
 
 const calcDiff = (a: number, b: number) => {
-    return `${ (((b - a) / a) * 100).toLocaleString() }%`;
+    if (!a) return 0;
+
+    return ((b - a) / a) * 100;
+}
+
+const transformToPropertyArray = (data: TradeDataSearch[]) => {
+    return data.reduce((acc, elem, index) => {
+        return {
+          prices: [...acc['prices'], parseFloat(elem.adv.price)],
+          tradableQuantitys: [...acc['tradableQuantitys'], parseFloat(elem.adv.tradableQuantity)]
+        };
+    }, { prices: [0], tradableQuantitys: [0]});
+}
+
+const transformToPropertyArraySide = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
+    return {
+        buy: transformToPropertyArray(dataBuy),
+        sell: transformToPropertyArray(dataSell)
+    }
 }
