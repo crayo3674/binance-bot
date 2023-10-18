@@ -158,7 +158,10 @@ const transformToPropertyArray = (data: TradeDataSearch[]) => {
           prices: [...acc['prices'], parseFloat(elem.adv.price)],
           tradableQuantitys: [...acc['tradableQuantitys'], parseFloat(elem.adv.tradableQuantity)]
         };
-    }, { prices: [0], tradableQuantitys: [0]});
+    }, {
+        prices: [] as number[],
+        tradableQuantitys: [] as number[]
+    });
 }
 
 const transformToPropertyArraySide = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
