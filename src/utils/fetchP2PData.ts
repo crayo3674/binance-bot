@@ -119,7 +119,7 @@ const logResult = (dataBuy: TradeDataSearch[], dataSell: TradeDataSearch[]) => {
     });
 
     table.push(
-        ['Median Price', calcMedianPrice(dataMetric.buy['prices']).toLocaleString(), calcMedianPrice(dataMetric.sell['prices'])],
+        ['Median Price', calcMedianPrice(dataMetric.buy['prices']).toLocaleString(), calcMedianPrice(dataMetric.sell['prices']).toLocaleString()],
         ['Min Price', calcMinPrice(dataMetric.buy['prices']).toLocaleString(), calcMinPrice(dataMetric.sell['prices']).toLocaleString()],
         ['Max Price', calcMaxPrice(dataMetric.buy['prices']).toLocaleString(), calcMaxPrice(dataMetric.sell['prices']).toLocaleString()],
         ['Total advs', dataBuy.length, dataSell.length],
